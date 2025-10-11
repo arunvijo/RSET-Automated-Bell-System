@@ -1,0 +1,3 @@
+25 9 * * 1,2,3,4,5,6 (cd /home/pi/bell/bell_project/client; python ring.py S)
+30 9 * * 1,2,3,4,5,6 (cd /home/pi/bell/bell_project/client; python anthem.py L)
+30 15 * * 1,2,3,4,5,6 (cd /home/pi/bell/bell_project/client; python ring.py L)

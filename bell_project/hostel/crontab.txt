@@ -1,0 +1,8 @@
+# m h  dom mon dow   command
+0 6 * * 0-6 (cd /home/pi/bell/bell_project/hostel; python hostel.py)
+15 8 * * 0-6 (cd /home/pi/bell/bell_project/hostel; python hostel.py)
+20 8 * * 0-6 (cd /home/pi/bell/bell_project/hostel; python hostel.py)
+30 18 * * 0-6 (cd /home/pi/bell/bell_project/hostel; python hostel.py)
+0 19 * * 0-6 (cd /home/pi/bell/bell_project/hostel; python hostel.py)
+30 20 * * 0-6 (cd /home/pi/bell/bell_project/hostel; python hostel.py)
+0 21 * * 0-6 (cd /home/pi/bell/bell_project/hostel; python hostel.py)

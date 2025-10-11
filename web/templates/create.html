@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+  <title>Automated Bell System</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/css/scrolling-nav.css" rel="stylesheet">
+
+  </head>
+
+  <body id="page-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="/">RSET : Automated Bell System</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            {% if username %}
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger">Logged in as : {{username}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/logout/">logout</a>
+            </li>
+            {% endif %}
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <header class="bg-primary text-white">
+      <div class="container text-center">
+        <h1>Welcome to RSET's Automated Bell System</h1>
+        <p class="lead">This system is built to automate the bell, anthem and announcements in Rajagiri School of Engineering and Technology </p>
+      </div>
+    </header>
+
+    <section id="about">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 mx-auto">
+            <form class="container offset-md-2" method="post">{% csrf_token %}
+                  <h2 class="display-3" > ENTER PROFILE DETAILS </h2>
+                  <h5>{{obj}}</h5>
+                  <div class="form-group col-md-8 col-xs-8 offset-xs-2" style="display: inline; margin-top:10px;">
+                  <label>Name of profile</label>
+                  <input type="text" name="name" class="form-control" required><br>
+                  {% for i in count %}
+                  <div id="{{i}}" {% if i > 3 %} style="display: none " {% endif %}>
+                  <label>Bell No. {{i}}</label>
+                  <input type="time" class="form-control" name="b{{i}}">
+                  <input type="radio" name="t{{i}}" value="L"><label>Long</label>
+                  <input type="radio" name="t{{i}}" value="S" checked><label>Short</label>
+                  <br>
+                  <label>Active Days:</label>
+                    <input type="checkbox" name="b{{i}}_d0" value="True">Sunday
+                    <input type="checkbox" name="b{{i}}_d1" value="True" checked>Monday
+                    <input type="checkbox" name="b{{i}}_d2" value="True" checked>Tuesday
+                    <input type="checkbox" name="b{{i}}_d3" value="True" checked>Wednesday
+                    <input type="checkbox" name="b{{i}}_d4" value="True" checked>Thursday
+                    <input type="checkbox" name="b{{i}}_d5" value="True" checked>Friday
+                    <input type="checkbox" name="b{{i}}_d6" value="True">Saturday
+                  <br>
+                  <input type="checkbox" name="a{{i}}" value="True"><label>Play anthem after this bell</label>
+                  <br><br>
+                  </div>
+                  {% endfor %}
+                  <button type="button" onclick="adder()">+</button>
+              <p class="offset-md-1">Important : You cannot alter the profile , once submitted</p>
+                      <input type="Submit" class="btn btn-primary btn-lg" name="signin">
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; RSET 2017</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Custom JS for dynamic input field-->
+    <script type="text/javascript">
+        var next = 3;
+        function adder(){
+          next=next+1;
+          if (next < 29) {
+            var element = document.getElementById(next.toString());
+            element.style.display = 'block';            
+          }
+        };
+    </script>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/vendor/jquery/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/vendor/popper/popper.min.js"></script>
+    <script src="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom JavaScript for this theme -->
+    <script src="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/js/scrolling-nav.js"></script>
+
+  </body>
+
+</html>
