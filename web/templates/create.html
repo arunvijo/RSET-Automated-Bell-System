@@ -1,123 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-
+<head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create Profile - Automated Bell System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* Make the body take up the full height of the browser window */
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column; /* Arrange elements vertically */
+            background-color: #f8f9fa;
+        }
+        /* This is the key: make the main content grow to push the footer down */
+        main {
+            flex: 1 0 auto;
+        }
+    </style>
+</head>
+<body>
 
-  <title>Automated Bell System</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/css/scrolling-nav.css" rel="stylesheet">
-
-  </head>
-
-  <body id="page-top">
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-      <div class="container">
-        <a class="navbar-brand js-scroll-trigger" href="/">RSET : Automated Bell System</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-          <ul class="navbar-nav ml-auto">
-            {% if username %}
-            <li class="nav-item">
-              <a class="nav-link js-scroll-trigger">Logged in as : {{username}}</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="/logout/">logout</a>
-            </li>
-            {% endif %}
-
-          </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">RSET: Automated Bell System</a>
+            <div class="ms-auto">
+                <ul class="navbar-nav">
+                    {% if username %}
+                    <li class="nav-item"><span class="navbar-text me-3">Logged in as: <strong>{{ username }}</strong></span></li>
+                    <li class="nav-item"><a class="btn btn-outline-light" href="{% url 'logout' %}">Logout</a></li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-      </div>
     </nav>
 
-    <header class="bg-primary text-white">
-      <div class="container text-center">
-        <h1>Welcome to RSET's Automated Bell System</h1>
-        <p class="lead">This system is built to automate the bell, anthem and announcements in Rajagiri School of Engineering and Technology </p>
-      </div>
-    </header>
-
-    <section id="about">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-8 mx-auto">
-            <form class="container offset-md-2" method="post">{% csrf_token %}
-                  <h2 class="display-3" > ENTER PROFILE DETAILS </h2>
-                  <h5>{{obj}}</h5>
-                  <div class="form-group col-md-8 col-xs-8 offset-xs-2" style="display: inline; margin-top:10px;">
-                  <label>Name of profile</label>
-                  <input type="text" name="name" class="form-control" required><br>
-                  {% for i in count %}
-                  <div id="{{i}}" {% if i > 3 %} style="display: none " {% endif %}>
-                  <label>Bell No. {{i}}</label>
-                  <input type="time" class="form-control" name="b{{i}}">
-                  <input type="radio" name="t{{i}}" value="L"><label>Long</label>
-                  <input type="radio" name="t{{i}}" value="S" checked><label>Short</label>
-                  <br>
-                  <label>Active Days:</label>
-                    <input type="checkbox" name="b{{i}}_d0" value="True">Sunday
-                    <input type="checkbox" name="b{{i}}_d1" value="True" checked>Monday
-                    <input type="checkbox" name="b{{i}}_d2" value="True" checked>Tuesday
-                    <input type="checkbox" name="b{{i}}_d3" value="True" checked>Wednesday
-                    <input type="checkbox" name="b{{i}}_d4" value="True" checked>Thursday
-                    <input type="checkbox" name="b{{i}}_d5" value="True" checked>Friday
-                    <input type="checkbox" name="b{{i}}_d6" value="True">Saturday
-                  <br>
-                  <input type="checkbox" name="a{{i}}" value="True"><label>Play anthem after this bell</label>
-                  <br><br>
-                  </div>
-                  {% endfor %}
-                  <button type="button" onclick="adder()">+</button>
-              <p class="offset-md-1">Important : You cannot alter the profile , once submitted</p>
-                      <input type="Submit" class="btn btn-primary btn-lg" name="signin">
-            </form>
-          </div>
+    <main>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-8">
+                    <div class="d-flex align-items-center mb-4">
+                         <a href="{% url 'home' %}" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i> Back</a>
+                         <h2>Create New Bell Profile</h2>
+                    </div>
+                   
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-4">
+                                    <label for="profileName" class="form-label fs-5">Name of Profile</label>
+                                    <input type="text" name="name" id="profileName" class="form-control" required placeholder="e.g., 'Regular Weekday Schedule'">
+                                </div>
+                                <h5 class="mb-3">Bell Entries</h5>
+                                <div class="accordion" id="bellAccordion"></div>
+                                <div class="mt-4">
+                                    <button type="button" id="addBellBtn" class="btn btn-secondary"><i class="bi bi-plus-circle"></i> Add Bell</button>
+                                    <button type="submit" class="btn btn-primary float-end"><i class="bi bi-check-circle"></i> Save Profile</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </section>
-    <!-- Footer -->
-    <footer class="py-5 bg-dark">
-      <div class="container">
-        <p class="m-0 text-center text-white">Copyright &copy; RSET 2017</p>
-      </div>
-      <!-- /.container -->
+    </main>
+
+    <footer class="py-4 bg-dark text-white-50">
+        <div class="container text-center">
+            <small>Copyright &copy; RSET 2017-2025</small>
+        </div>
     </footer>
 
-    <!-- Custom JS for dynamic input field-->
-    <script type="text/javascript">
-        var next = 3;
-        function adder(){
-          next=next+1;
-          if (next < 29) {
-            var element = document.getElementById(next.toString());
-            element.style.display = 'block';            
-          }
-        };
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const addBellBtn = document.getElementById('addBellBtn');
+            const accordionContainer = document.getElementById('bellAccordion');
+            let bellCounter = -1;
+
+            const createBellEntry = () => {
+                bellCounter++;
+                const entryHtml = `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${bellCounter}">Bell #${bellCounter + 1}</button></h2>
+                        <div id="collapse-${bellCounter}" class="accordion-collapse collapse show" data-bs-parent="#bellAccordion">
+                            <div class="accordion-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6"><label class="form-label">Bell Time</label><input type="time" class="form-control" name="bell_time"></div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Bell Type</label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="bell_type_${bellCounter}" id="short-${bellCounter}" value="S" checked>
+                                                <label class="form-check-label" for="short-${bellCounter}">Short</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="bell_type_${bellCounter}" id="long-${bellCounter}" value="L">
+                                                <label class="form-check-label" for="long-${bellCounter}">Long</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Active Days</label>
+                                        <div>
+                                            ${['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map(day => `
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" name="${day}_${bellCounter}" value="True" ${day !== 'sunday' && day !== 'saturday' ? 'checked' : ''}>
+                                                <label class="form-check-label">${day.charAt(0).toUpperCase() + day.slice(1)}</label>
+                                            </div>`).join('')}
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="checkbox" name="play_anthem_${bellCounter}" value="True">
+                                            <label class="form-check-label">Play anthem after this bell</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                accordionContainer.insertAdjacentHTML('beforeend', entryHtml);
+            };
+
+            addBellBtn.addEventListener('click', createBellEntry);
+            createBellEntry();
+        });
     </script>
-
-    <!-- Bootstrap core JavaScript -->
-    <script src="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/vendor/jquery/jquery.min.js"></script>
-    <script src="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/vendor/popper/popper.min.js"></script>
-    <script src="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/vendor/bootstrap/js/bootstrap.min.js"></script>
-
-    <!-- Plugin JavaScript -->
-    <script src="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom JavaScript for this theme -->
-    <script src="https://cdn.rawgit.com/BlackrockDigital/startbootstrap-scrolling-nav/master/js/scrolling-nav.js"></script>
-
-  </body>
-
+</body>
 </html>
