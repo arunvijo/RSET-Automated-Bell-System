@@ -4,6 +4,12 @@ from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.http import HttpResponseRedirect
 from .models import Profile, Bell, main_current, pg_current, ke_current
 
+# At the top of web/views.py, add these new imports:
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .serializers import ProfileSerializer
+
+
 @ensure_csrf_cookie
 def login_user(request):
     """
@@ -198,3 +204,30 @@ def edit_profile(request, profile_id):
         'username': str(request.user.username)
     }
     return render(request, 'edit_profile.html', context)
+
+
+# Add this new function at the end of the file:
+@api_view(['GET'])
+def get_schedule_api(request, block_name):
+    """
+    API endpoint for clients to fetch their current active schedule.
+    """
+    active_profile_name = None
+    block_name = block_name.lower()
+
+    try:
+        if block_name == 'main':
+            active_profile_name = main_current.objects.get(id=1).name
+        elif block_name == 'pg':
+            active_profile_name = pg_current.objects.get(id=1).name
+        elif block_name == 'ke':
+            active_profile_name = ke_current.objects.get(id=1).name
+        else:
+            return Response({'error': 'Invalid block name'}, status=404)
+
+        profile = Profile.objects.get(name=active_profile_name)
+        serializer = ProfileSerializer(profile)
+        return Response(serializer.data)
+
+    except Profile.DoesNotExist:
+        return Response({'error': f'Active profile "{active_profile_name}" not found.'}, status=404)

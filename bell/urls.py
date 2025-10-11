@@ -12,8 +12,13 @@ urlpatterns = [
     url(r'^home/', home, name='home'),
     url(r'^apply/', apply, name='apply'),
     url(r'^create/', create, name='create'),
+
     # ADD THIS LINE FOR THE EDIT FUNCTIONALITY
     path('profile/<int:profile_id>/edit/', edit_profile, name='edit_profile'),
+
+    # ADD THIS NEW API URL PATTERN
+    path('api/schedule/<str:block_name>/', get_schedule_api, name='api_get_schedule'),
+    
     url(r'^profiles/', view_profiles, name='profiles'),
     url(r'^logout/', logout_user, name='logout'),
 ]
