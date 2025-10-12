@@ -15,7 +15,7 @@ The core of the modernized system is its **resilience**. Client devices are "sma
 
 ### Architectural Diagram
 
-```
+```bash
 
 \+-----------------+      +----------------------+      +--------------------+
 |  Administrator  | ---\> |  Django Web App      |      |  SQLite Database   |
@@ -33,8 +33,8 @@ v                   v                   v
 | [Pulls schedule |   | [Pulls schedule |   | [Pulls schedule |
 |  on boot]       |   |  on boot]       |   |  on boot]       |
 \+-----------------+   +-----------------+   +-----------------+
-
-````
+```
+---
 
 ## Key Features
 
@@ -170,4 +170,27 @@ These steps are for setting up a Raspberry Pi device that will ring the bells.
 
 The client devices will now automatically fetch and apply the correct schedule the next time they boot up.
 
-````
+---
+
+## Contributing
+
+Contributions are welcome! If you have ideas for improvements, please open an issue first to discuss what you would like to change.
+
+Please make sure to update tests as appropriate. To contribute, please fork the repository and create a pull request.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+---
+
+## Team
+
+This project was developed and modernized by:
+
+* Arun
+* Aaromal
+* Abhinav
+* Alan Madhu
