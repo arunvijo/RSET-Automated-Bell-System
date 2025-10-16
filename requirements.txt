@@ -1,0 +1,14 @@
+# Django Core
+Django
+
+# REST API
+djangorestframework
+
+# Production Server
+gunicorn
+
+requests
+
+
+
+
