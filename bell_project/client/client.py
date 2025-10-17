@@ -93,42 +93,42 @@ def check_and_ring_bells():
     global RUNG_BELLS_TODAY, LAST_SCHEDULE_FETCH_DATE
 
     now = datetime.now()
-    current_day_str = now.strftime('%A').lower() # e.g., 'friday'
-    current_time_str = now.strftime('%H:%M') # e.g., '14:55'
-    
-    # --- Daily Schedule Fetch ---
-    # If it's a new day, fetch the schedule again.
+    # Check if it's a new day (e.g., past midnight). If so, fetch a fresh schedule.
     if now.date() != LAST_SCHEDULE_FETCH_DATE:
         print(f"\n[{now}] It's a new day! Fetching fresh schedule from server...")
         fetch_schedule_from_server()
-        # The fetch function will reset RUNG_BELLS_TODAY
+    
+    # Get current day and time FOR EACH CHECK
+    current_day_str = now.strftime('%A').lower() # e.g., 'friday'
+    current_time_str = now.strftime('%H:%M')     # e.g., '15:18'
     
     for bell in SCHEDULE:
         bell_time = bell['time'][:5] # Get 'HH:MM' from 'HH:MM:SS'
         
-        # Check if it's the right day and the right time
-        if bell.get(current_day_str, False) and bell_time == current_time_str:
+        # Check 1: Is it the right day for this bell to ring?
+        is_today = bell.get(current_day_str, False)
+        
+        # Check 2: Is it the right time?
+        is_time_now = (bell_time == current_time_str)
+        
+        # Check 3: Have we already rung for this exact time today?
+        has_already_rung = bell_time in RUNG_BELLS_TODAY
+        
+        if is_today and is_time_now and not has_already_rung:
+            print(f"\n[{now}] MATCH FOUND! Time to ring bell for {bell_time}.")
             
-            # Check if we've already rung this bell at this time today
-            if bell_time not in RUNG_BELLS_TODAY:
-                print(f"\n[{now}] MATCH FOUND! Time to ring bell for {bell_time}.")
-                
-                # Determine duration
-                duration = LONG_BELL_DURATION if bell['is_long'] else SHORT_BELL_DURATION
-                
-                # Ring the bell
-                ring_bell(duration)
-                
-                # If anthem needs to be played, do it after the bell
-                if bell['play_anthem']:
-                    print(f"    - Scheduler: Anthem scheduled. Playing after bell.")
-                    time.sleep(2) # A short pause after the bell
-                    play_anthem()
-                
-                # Mark this bell time as rung for today to prevent duplicates
-                RUNG_BELLS_TODAY.add(bell_time)
-                print(f"[{now}] Action complete for {bell_time}.")
-                break # Exit loop after finding and executing a match
+            duration = LONG_BELL_DURATION if bell['is_long'] else SHORT_BELL_DURATION
+            ring_bell(duration)
+            
+            if bell['play_anthem']:
+                print(f"    - Scheduler: Anthem scheduled. Playing after bell.")
+                time.sleep(2)
+                play_anthem()
+            
+            # Mark this time as "rung" for today to prevent duplicates
+            RUNG_BELLS_TODAY.add(bell_time)
+            print(f"[{now}] Action complete for {bell_time}.")
+            break # Stop checking other bells for this minute.
 
 if __name__ == "__main__":
     setup_gpio()
@@ -154,3 +154,4 @@ if __name__ == "__main__":
         # This ensures the GPIO pins are safely cleaned up on exit
         GPIO.cleanup()
         print("GPIO cleanup complete. Goodbye.")
+
