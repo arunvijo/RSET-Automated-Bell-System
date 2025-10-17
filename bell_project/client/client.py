@@ -130,6 +130,47 @@ def check_and_ring_bells():
             print(f"[{now}] Action complete for {bell_time}.")
             break # Stop checking other bells for this minute.
 
+# --- NEW FUNCTIONS FOR REAL-TIME COMMANDS ---
+
+def turn_amp_on():
+    """Activates the amplifier relay."""
+    print("    - Command: Turning Amplifier ON.")
+    GPIO.output(AMP_RELAY_PIN, GPIO.LOW) # LOW = ON
+
+def turn_amp_off():
+    """Deactivates the amplifier relay."""
+    print("    - Command: Turning Amplifier OFF.")
+    GPIO.output(AMP_RELAY_PIN, GPIO.HIGH) # HIGH = OFF
+
+def check_for_server_commands():
+    """Polls the server for real-time commands and executes them."""
+    command_api_url = f"http://{SERVER_IP}:80/api/command/check/"
+    try:
+        response = requests.get(command_api_url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get('status') == 'command_found':
+            command = data.get('command')
+            print(f"\n[{datetime.now()}] Received Command from Server: {command}")
+
+            if command == 'TEST_BELL':
+                # For a test, we can use the short bell duration
+                ring_bell(SHORT_BELL_DURATION)
+            elif command == 'AMP_ON':
+                turn_amp_on()
+            elif command == 'AMP_OFF':
+                turn_amp_off()
+            
+            print(f"[{datetime.now()}] Action complete for command {command}.")
+
+    except requests.exceptions.RequestException:
+        # Don't print an error here to avoid spamming the log if the server is temporarily down.
+        # It will just try again on the next loop.
+        pass
+
+# --- UPDATED MAIN EXECUTION BLOCK ---
+
 if __name__ == "__main__":
     setup_gpio()
     
@@ -145,8 +186,14 @@ if __name__ == "__main__":
     
     try:
         while True:
+            # This part handles the regular, time-based bell schedule
             check_and_ring_bells()
-            time.sleep(1) # Check the time every second
+
+            # This new part checks for immediate commands from the server
+            check_for_server_commands()
+
+            # Poll for commands every 5 seconds. The bell check runs every second.
+            time.sleep(5) 
             
     except KeyboardInterrupt:
         print("\nUser interrupted. Shutting down.")
@@ -154,4 +201,3 @@ if __name__ == "__main__":
         # This ensures the GPIO pins are safely cleaned up on exit
         GPIO.cleanup()
         print("GPIO cleanup complete. Goodbye.")
-
