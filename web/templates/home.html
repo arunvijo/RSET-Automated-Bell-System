@@ -8,22 +8,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
-        /* Make sure the body takes up the full height of the browser window */
         html, body {
             height: 100%;
         }
         body {
             display: flex;
-            flex-direction: column; /* Arrange elements vertically */
+            flex-direction: column;
             background-color: #f8f9fa;
         }
-        /* This is the key: make the main content grow to push the footer down */
         main {
             flex: 1 0 auto;
         }
         .feature-icon {
-            font-size: 3rem;
-            color: var(--bs-primary);
+            font-size: 2.5rem; /* Balanced icon size */
+        }
+        .card {
+            transition: transform .2s, box-shadow .2s; /* Add a subtle hover effect */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
         }
     </style>
 </head>
@@ -55,43 +59,66 @@
     <main>
         <div class="container px-4 py-5">
             <h2 class="pb-2 border-bottom">Dashboard</h2>
-            <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+
+            <!-- Changed to a 2x2 grid on medium screens for better alignment -->
+            <div class="row g-4 py-5 row-cols-1 row-cols-md-2">
+
+                <!-- View Profiles Card -->
                 <div class="col">
                     <div class="card h-100 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-light bg-gradient rounded-3 mb-3 d-inline-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem;">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="feature-icon bg-light bg-gradient text-primary rounded-3 mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem;">
+                                <i class="bi bi-list-task"></i>
+                            </div>
+                            <h3 class="fs-4">View Profiles</h3>
+                            <p class="text-muted flex-grow-1">Review all bell schedules that have been created in the system.</p>
+                            <a href="{% url 'profiles' %}" class="btn btn-primary mt-auto">View All</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add New Profile Card -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                             <div class="feature-icon bg-light bg-gradient text-success rounded-3 mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem;">
+                                <i class="bi bi-plus-circle"></i>
+                            </div>
+                            <h3 class="fs-4">Add New Profile</h3>
+                            <p class="text-muted flex-grow-1">Create a new custom bell schedule from scratch for events.</p>
+                            <a href="{% url 'create' %}" class="btn btn-success mt-auto">Create New</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apply Profile Card -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                             <div class="feature-icon bg-light bg-gradient text-info rounded-3 mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem;">
                                 <i class="bi bi-calendar-check"></i>
                             </div>
-                            <h3 class="fs-2">Apply Profile</h3>
-                            <p>Select and apply an existing bell schedule to system blocks.</p>
-                            <a href="{% url 'apply' %}" class="btn btn-primary">Go to Apply</a>
+                            <h3 class="fs-4">Apply Profile</h3>
+                            <p class="text-muted flex-grow-1">Select and apply an existing bell schedule to system blocks.</p>
+                            <a href="{% url 'apply' %}" class="btn btn-info mt-auto text-white">Go to Apply</a>
                         </div>
                     </div>
                 </div>
+                
+                <!-- System Control Card (Updated for uniformity) -->
                 <div class="col">
                     <div class="card h-100 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-light bg-gradient rounded-3 mb-3 d-inline-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem;">
-                               <i class="bi bi-plus-circle"></i>
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="feature-icon bg-light bg-gradient text-danger rounded-3 mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem;">
+                                <i class="bi bi-sliders"></i>
                             </div>
-                            <h3 class="fs-2">Add New Profile</h3>
-                            <p>Create a new custom bell schedule from scratch for events.</p>
-                            <a href="{% url 'create' %}" class="btn btn-success">Create New</a>
+                            <h3 class="fs-4">System Control</h3>
+                            <p class="text-muted flex-grow-1">Send real-time commands like Amp On/Off or a Test Bell.</p>
+                            <a href="{% url 'system_control' %}" class="btn btn-danger mt-auto">Control Panel</a>
                         </div>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-light bg-gradient rounded-3 mb-3 d-inline-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem;">
-                               <i class="bi bi-list-task"></i>
-                            </div>
-                            <h3 class="fs-2">View Profiles</h3>
-                            <p>Review all the bell schedules that have been created in the system.</p>
-                            <a href="{% url 'profiles' %}" class="btn btn-info">View All</a>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     </main>

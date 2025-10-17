@@ -34,6 +34,22 @@ class Bell(models.Model):
     def __str__(self):
         # Provides a helpful name in the Django admin area.
         return f"{self.profile.name} at {self.time.strftime('%I:%M %p')}"
+    
+
+# Add this new model at the end of the file
+class ClientCommand(models.Model):
+    COMMAND_CHOICES = [
+        ('AMP_ON', 'Amp On'),
+        ('AMP_OFF', 'Amp Off'),
+        ('TEST_BELL', 'Test Bell'),
+    ]
+    command = models.CharField(max_length=20, choices=COMMAND_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+    # This field will track if the client has seen and executed the command
+    acknowledged = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.get_command_display()} at {self.created_at}"
 
 # These models are for the 'apply' functionality and can remain.
 # We'll rename the old 'blk' model that they referenced.

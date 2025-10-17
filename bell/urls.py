@@ -18,6 +18,9 @@ urlpatterns = [
 
     # ADD THIS NEW API URL PATTERN
     path('api/schedule/<str:block_name>/', get_schedule_api, name='api_get_schedule'),
+
+    path('api/command/check/',check_for_command, name='check_for_command'),
+    path('control/', system_control, name='system_control'),
     
     url(r'^profiles/', view_profiles, name='profiles'),
     url(r'^logout/', logout_user, name='logout'),

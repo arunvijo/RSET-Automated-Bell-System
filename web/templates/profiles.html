@@ -8,16 +8,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
-        /* Make the body take up the full height of the browser window */
         html, body {
             height: 100%;
         }
         body {
             display: flex;
-            flex-direction: column; /* Arrange elements vertically */
+            flex-direction: column;
             background-color: #f8f9fa;
         }
-        /* This is the key: make the main content grow to push the footer down */
         main {
             flex: 1 0 auto;
         }
@@ -25,7 +23,7 @@
         .icon-false { color: #ccc; }
     </style>
 </head>
-<body>
+<body class="d-flex flex-column h-100">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -41,18 +39,44 @@
         </div>
     </nav>
 
-    <main>
+    <main class="flex-shrink-0">
         <div class="container my-5">
             <div class="d-flex align-items-center mb-4">
                 <a href="{% url 'home' %}" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i> Back</a>
-                <h2>All Bell Profiles</h2>
+                <h2>View Bell Profiles</h2>
             </div>
 
-            {% for profile in profiles %}
             <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Select Profile</h5>
+                    <p class="card-text">Choose a profile from the list below to see its detailed schedule.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row align-items-end">
+                            <div class="col-md-8">
+                                <label for="profile-select" class="form-label visually-hidden">Select a profile</label>
+                                <select class="form-select" name="profile_id" id="profile-select" required>
+                                    <option value="" disabled {% if not selected_profile %}selected{% endif %}>-- Select a Profile --</option>
+                                    {% for profile in profiles %}
+                                        <option value="{{ profile.id }}" {% if selected_profile.id == profile.id %}selected{% endif %}>
+                                            {{ profile.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 mt-2 mt-md-0">
+                                <button type="submit" class="btn btn-primary w-100">View Details</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if selected_profile %}
+            <div class="card shadow-sm mb-4" id="profile-details">
                 <div class="card-header fs-5 d-flex justify-content-between align-items-center">
-                    <span>Profile Name: <strong>{{ profile.name }}</strong></span>
-                    <a href="{% url 'edit_profile' profile.id %}" class="btn btn-sm btn-outline-secondary">
+                    <span>Profile Details: <strong>{{ selected_profile.name }}</strong></span>
+                    <a href="{% url 'edit_profile' selected_profile.id %}" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-pencil-square"></i> Edit
                     </a>
                 </div>
@@ -74,7 +98,7 @@
                                 </tr>
                             </thead>
                             <tbody class="text-center">
-                                {% for bell in profile.bells.all %}
+                                {% for bell in selected_profile.bells.all %}
                                 <tr>
                                     <td>{{ bell.time|time:"g:i A" }}</td>
                                     <td>{% if bell.is_long %}Long{% else %}Short{% endif %}</td>
@@ -97,13 +121,15 @@
                     </div>
                 </div>
             </div>
-            {% empty %}
+            {% endif %}
+            
+            {% if not profiles %}
                 <div class="alert alert-info">No profiles have been created yet.</div>
-            {% endfor %}
+            {% endif %}
         </div>
     </main>
 
-    <footer class="py-4 bg-dark text-white-50">
+    <footer class="footer mt-auto py-3 bg-dark text-white-50">
         <div class="container text-center">
             <small>Copyright &copy; RSET 2017-2025</small>
         </div>

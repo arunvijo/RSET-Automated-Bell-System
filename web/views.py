@@ -2,12 +2,57 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.http import HttpResponseRedirect
-from .models import Profile, Bell, main_current, pg_current, ke_current
+from .models import Profile, Bell, main_current, pg_current, ke_current,ClientCommand 
 
 # At the top of web/views.py, add these new imports:
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import ProfileSerializer
+
+# At the top of web/views.py, add these imports
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+# At the top of web/views.py, add the 'messages' import
+from django.contrib import messages
+
+# ... keep all your other views ...
+
+# Add this new view function at the end of the file
+def system_control(request):
+    if not request.user.is_authenticated:
+        return render(request, 'login.html', {'obj': 'Please login first'})
+
+    if request.method == 'POST':
+        command_type = request.POST.get('command')
+        if command_type in ['AMP_ON', 'AMP_OFF', 'TEST_BELL']:
+            # Create the command object in the database
+            ClientCommand.objects.create(command=command_type)
+            messages.success(request, f"Command '{command_type.replace('_', ' ').title()}' sent successfully!")
+        return redirect('system_control') # Redirect to the same page to prevent re-posting
+
+    context = {'username': str(request.user.username)}
+    return render(request, 'system_control.html', context)
+
+# ... keep all your existing views (login_view, home, etc.) ...
+
+# Add this new function at the end of the file
+@csrf_exempt # Exempt from CSRF token check since it's a simple GET API
+def check_for_command(request):
+    """
+    API endpoint for the client script to check for new commands.
+    """
+    # Find the latest command that has not been acknowledged yet
+    command = ClientCommand.objects.filter(acknowledged=False).order_by('-created_at').first()
+
+    if command:
+        # Mark it as acknowledged so it doesn't run again
+        command.acknowledged = True
+        command.save()
+        # Return the command as JSON
+        return JsonResponse({'status': 'command_found', 'command': command.command})
+    else:
+        # No new commands
+        return JsonResponse({'status': 'no_command'})
 
 
 @ensure_csrf_cookie
@@ -133,18 +178,23 @@ def create(request):
 
 
 @csrf_protect
+# In web/views.py
 def view_profiles(request):
-    """
-    Displays all created profiles and their bell schedules in a clean, readable format.
-    """
     if not request.user.is_authenticated:
         return render(request, 'login.html', {'obj': 'Please login first'})
-    
-    # Efficiently fetches all profiles and their related bells in just two database queries
-    all_profiles = Profile.objects.prefetch_related('bells').all()
-    
+
+    all_profiles = Profile.objects.all()
+    selected_profile = None
+
+    if request.method == 'POST':
+        profile_id = request.POST.get('profile_id')
+        if profile_id:
+            # Use prefetch_related for efficiency when getting the selected profile
+            selected_profile = Profile.objects.prefetch_related('bells').get(id=profile_id)
+
     context = {
         'profiles': all_profiles,
+        'selected_profile': selected_profile,
         'username': str(request.user.username),
     }
     return render(request, 'profiles.html', context)
