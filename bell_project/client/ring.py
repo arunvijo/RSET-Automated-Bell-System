@@ -6,27 +6,36 @@ import RPi.GPIO as GPIO
 import sys
 import datetime
 
+# --- GPIO SETUP ---
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD) #setting board configuration
 relay_out = 37 #pin 37 for relay output
 GPIO.setup(relay_out, GPIO.OUT)
-GPIO.output(relay_out,True) #setting relay out to high permanently
+GPIO.output(relay_out,True) #setting relay out to high permanently (OFF)
 
 if __name__ == '__main__':
-	now = datetime.datetime.now()
-	#Do not ring if on Sunday
-	#if (now.isoweekday() == 7) :
-		#sys.exit(0)
-        #Uncomment one of the following
-	#Do not play if on Second Saturday
-	#if (now.isoweekday() == 6 and now.day > 7 and now.day < 15) :
-	#Do not play if on First or Second Saturday
-	if (now.isoweekday() == 6 and now.day < 15) :
-		sys.exit(0)
-	if str(sys.argv[1]) == 'S':
-		t = 2
-	else :
-		t = 5
-	GPIO.output(relay_out,False) #setting relay out to high permanently
-	time.sleep(t)
-	GPIO.output(relay_out,True)
+    print("[ring.py] Script started.")
+    now = datetime.datetime.now()
+    
+    #Do not play if on First or Second Saturday
+    if (now.isoweekday() == 6 and now.day < 15) :
+        print("[ring.py] First or Second Saturday, exiting.")
+        sys.exit(0)
+    
+    # Determine duration
+    try:
+        bell_type = str(sys.argv[1])
+        if bell_type == 'S':
+            t = 2  # Short bell
+        else :
+            t = 5  # Long bell
+    except IndexError:
+        # Default to short bell if no argument is provided
+        t = 2
+
+    # --- RING BELL ---
+    print(f"[ring.py] Ringing bell for {t} seconds (Pin {relay_out})")
+    GPIO.output(relay_out,False) #setting relay out to low (ON)
+    time.sleep(t)
+    GPIO.output(relay_out,True) #setting relay out to high (OFF)
+    print(f"[ring.py] Bell finished ringing.")

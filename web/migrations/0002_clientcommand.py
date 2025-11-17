@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             name='ClientCommand',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('command', models.CharField(choices=[('AMP_ON', 'Amp On'), ('AMP_OFF', 'Amp Off'), ('TEST_BELL', 'Test Bell')], max_length=20)),
+                ('command', models.CharField(choices=[('AMP_ON', 'Amp On'), ('AMP_OFF', 'Amp Off'), ('TEST_BELL', 'Test Bell'), ('FETCH_SCHEDULE', 'Fetch Schedule')], max_length=20)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('acknowledged', models.BooleanField(default=False)),
             ],

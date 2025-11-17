@@ -92,6 +92,8 @@ def logout_user(request):
     logout(request)
     return render(request, 'login.html', {'obj': 'Logged out successfully'})
 
+# web/views.py
+
 @csrf_protect
 def apply(request):
     """
@@ -112,22 +114,34 @@ def apply(request):
         pg_str = request.POST.get('pg')
         ke_str = request.POST.get('ke')
         
+        profile_was_changed = False # <-- ADD THIS LINE
+
         if main_str:
             obj1 = main_current.objects.get(id=1)
             obj1.name = main_str
             obj1.save()
             currentvalues["main"] = main_str
+            profile_was_changed = True # <-- ADD THIS LINE
         if pg_str:
             obj2 = pg_current.objects.get(id=1)
             obj2.name = pg_str
             obj2.save()
             currentvalues["pg"] = pg_str
+            profile_was_changed = True # <-- ADD THIS LINE
         if ke_str:
             obj3 = ke_current.objects.get(id=1)
             obj3.name = ke_str
             obj3.save()
             currentvalues["ke"] = ke_str
+            profile_was_changed = True # <-- ADD THIS LINE
             
+        # --- NEW LOGIC ---
+        # If any profile was changed, send ONE command for the client
+        # to pull the new schedule.
+        if profile_was_changed:
+            ClientCommand.objects.create(command='FETCH_SCHEDULE')
+        # --- END NEW LOGIC ---
+
         profiles = Profile.objects.all()
         return render(request, 'apply.html', {'obj': profiles, 'status': 'Successfully applied', 'username': str(request.user.username), 'currvals': currentvalues})
 

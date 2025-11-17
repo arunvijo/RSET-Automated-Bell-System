@@ -42,6 +42,7 @@ class ClientCommand(models.Model):
         ('AMP_ON', 'Amp On'),
         ('AMP_OFF', 'Amp Off'),
         ('TEST_BELL', 'Test Bell'),
+        ('FETCH_SCHEDULE', 'Fetch Schedule'), # <-- ADD THIS LINE
     ]
     command = models.CharField(max_length=20, choices=COMMAND_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
