@@ -1,6 +1,18 @@
 #this program will ring the bell, set a pin high for few seconds 
 # add pins for ringing bell
 
+#import sys
+#try:
+#    # Try to import the real library
+#    import RPi.GPIO
+#except (ImportError, RuntimeError):
+#    # If it fails (i.e., we're on the VM), inject the fake library
+#    print("<<< Not on a Pi. Injecting fake RPi.GPIO module. >>>")
+#    import fake_rpi
+#    sys.modules['RPi'] = fake_rpi.RPi
+#    sys.modules['RPi.GPIO'] = fake_rpi.RPi.GPIO
+
+
 import time
 import RPi.GPIO as GPIO
 import sys

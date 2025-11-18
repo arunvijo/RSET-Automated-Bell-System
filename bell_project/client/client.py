@@ -1,5 +1,17 @@
+#import sys
+#try:
+#    # Try to import the real library
+#    import RPi.GPIO
+#except (ImportError, RuntimeError):
+#    # If it fails (i.e., we're on the VM), inject the fake library
+#    print("<<< Not on a Pi. Injecting fake RPi.GPIO module. >>>")
+#    import fake_rpi
+#    sys.modules['RPi'] = fake_rpi.RPi
+#    sys.modules['RPi.GPIO'] = fake_rpi.RPi.GPIO
+
+
 import requests
-import RPi.GPIO as GPIO 
+import RPi.GPIO as GPIO
 import time
 from datetime import datetime
 import os
@@ -7,6 +19,7 @@ import os
 # --- (1) CONFIGURE THESE SETTINGS ---
 MY_BLOCK_NAME = "main"
 SERVER_IP = "192.168.11.218"
+#SERVER_IP = "127.0.0.1"
 GPIO.setmode(GPIO.BOARD)
 BELL_RELAY_PIN = 37
 AMP_RELAY_PIN = 40
@@ -26,12 +39,12 @@ def setup_gpio():
     GPIO.setup(AMP_RELAY_PIN, GPIO.OUT, initial=GPIO.HIGH)
     print("GPIO pins initialized. Relays are OFF.")
 
-def generate_crontab(schedule):
+def generate_crontab(schedule, profile_name):
     global SCRIPT_PATH, MY_BLOCK_NAME
     print(f"    - CronGen: Generating new crontab from {len(schedule)} bell entries...")
     
     # Add the profile name as a comment at the top of the cron file
-    cron_lines = [f"# Current active profile: {MY_BLOCK_NAME}"]
+    cron_lines = [f"# Current active profile: {profile_name}"]
 
     for bell in schedule:
         try:
@@ -80,22 +93,25 @@ def generate_crontab(schedule):
         print(f"[{datetime.now()}] !!! FAILED to generate or apply crontab: {e}")
 
 def fetch_schedule_from_server():
-    global SCHEDULE, LAST_SCHEDULE_FETCH_DATE
+    global SCHEDULE, LAST_SCHEDULE_FETCH_DATE, MY_BLOCK_NAME
 
     print(f"[{datetime.now()}] Fetching schedule from API...")
     api_url = f"http://{SERVER_IP}:80/api/schedule/{MY_BLOCK_NAME}/"
+#    api_url = f"http://{SERVER_IP}:8000/api/schedule/{MY_BLOCK_NAME}/"
 
     try:
         response = requests.get(api_url, timeout=15)
         response.raise_for_status()
 
-        SCHEDULE = response.json().get('bells', [])
+        data = response.json()
+        SCHEDULE = data.get('bells', [])
+        profile_name = data.get('name', MY_BLOCK_NAME) # Get profile name, fallback to block name
         LAST_SCHEDULE_FETCH_DATE = datetime.now().date()
         RUNG_BELLS_TODAY.clear()
 
-        print(f"[{datetime.now()}] Successfully fetched schedule. Found {len(SCHEDULE)} bell times.")
+        print(f"[{datetime.now()}] Successfully fetched schedule '{profile_name}'. Found {len(SCHEDULE)} bell times.")
         
-        generate_crontab(SCHEDULE) 
+        generate_crontab(SCHEDULE, profile_name) 
 
     except requests.exceptions.RequestException as e:
         print(f"[{datetime.now()}] !!! FAILED to fetch schedule: {e}.")
@@ -119,7 +135,7 @@ def play_anthem():
     time.sleep(1)
     anthem_path = os.path.join(SCRIPT_PATH, "RajagiriAnthemEnglish.mp3")
     print(f"    - Anthem Player: Playing anthem file at {anthem_path}")
-    os.system(f"mpg132 -q {anthem_path}") # Using mpg123
+    os.system(f"mpg123 -q {anthem_path}") # Using mpg123
     print(f"    - Anthem Player: Turning Amplifier OFF.")
     GPIO.output(AMP_RELAY_PIN, GPIO.HIGH)
 
@@ -134,6 +150,7 @@ def turn_amp_off():
 def check_for_server_commands():
     print(f"[{datetime.now()}] Checking for real-time commands...")
     command_api_url = f"http://{SERVER_IP}:80/api/command/check/"
+#    command_api_url = f"http://{SERVER_IP}:8000/api/command/check/"
     try:
         response = requests.get(command_api_url, timeout=5)
         response.raise_for_status()
@@ -147,7 +164,7 @@ def check_for_server_commands():
                 ring_bell(SHORT_BELL_DURATION)
             elif command == 'AMP_ON':
                 turn_amp_on()
-            elif command == 'AMP__OFF':
+            elif command == 'AMP_OFF':
                 turn_amp_off()
             elif command == 'FETCH_SCHEDULE':
                 print(f"[{datetime.now()}] Received command to fetch new schedule.")
